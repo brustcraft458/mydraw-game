@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,81 @@
             background-image: linear-gradient(45deg, #1a75ff 25%, #0066ff 25%, #0066ff 50%, #1a75ff 50%, #1a75ff 75%, #0066ff 75%, #0066ff 100%);
             background-size: 56.57px 56.57px;
         }
-        .player-list { max-height: 600px; overflow-y: auto; }
-        .player-item { background: white; border-radius: 8px; margin-bottom: 5px; padding: 8px; }
-        .tools-panel { background: #1a1a1a; border-radius: 8px; padding: 10px; }
-        .color-btn { width: 30px; height: 30px; border-radius: 4px; border: 2px solid white; margin: 2px; }
-        .canvas-area { background: white; border-radius: 8px; min-height: 400px; position: relative; }
-        #drawingCanvas { border-radius: 8px; background: white; width: 100%; height: 100%; }
-        .avatar { font-size: 24px; color: #555; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background-color: #e0e0e0; }
-        .word-display { font-size: 24px; letter-spacing: 8px; font-weight: bold; color: #333; }
-        .chat-area { background: white; border-radius: 8px; height: 200px; overflow-y: auto; }
-        .timer { font-size: 18px; font-weight: bold; color: #ff0000; }
+
+        .player-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            padding: 8px;
+        }
+
+        .tools-panel {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid white;
+            margin: 2px;
+        }
+
+        .canvas-area {
+            background: white;
+            border-radius: 8px;
+            min-height: 400px;
+            position: relative;
+        }
+
+        #drawingCanvas {
+            border-radius: 8px;
+            background: white;
+            width: 100%;
+            height: 100%;
+        }
+
+        .avatar {
+            font-size: 24px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+        }
+
+        .word-display {
+            font-size: 24px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .chat-area {
+            background: white;
+            border-radius: 8px;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        .timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff0000;
+        }
     </style>
 </head>
+
 <body class="py-4">
     <div class="container-fluid">
         <div class="row g-3">
@@ -94,12 +158,14 @@
     </div>
 
     <!-- Modal for displaying leaderboard -->
-    <div class="modal fade" id="leaderboardModal" tabindex="-1" aria-labelledby="leaderboardModalLabel" aria-hidden="true">
+    <div class="modal fade" id="leaderboardModal" tabindex="-1" aria-labelledby="leaderboardModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="leaderboardModalLabel">Leaderboard</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-leaderboard"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        id="close-leaderboard"></button>
                 </div>
                 <div class="modal-body">
                     <ul id="leaderboard-list">
@@ -123,9 +189,9 @@
                 const isCorrect = randomGuess === word;
                 if (isCorrect) {
                     this.score += 5;
-                    return {correct: true, text: randomGuess};
+                    return { correct: true, text: randomGuess };
                 } else {
-                    return {correct: false, text: randomGuess};
+                    return { correct: false, text: randomGuess };
                 }
             }
 
@@ -164,14 +230,20 @@
             }
 
             startDrawing(e) {
-                this.drawing = true;  // Set drawing to true when user starts drawing
+                e.preventDefault(); // Prevents default touch actions (like scrolling)
+                this.drawing = true;
+                const x = e.offsetX !== undefined ? e.offsetX : e.touches[0].clientX - this.canvas.offsetLeft;
+                const y = e.offsetY !== undefined ? e.offsetY : e.touches[0].clientY - this.canvas.offsetTop;
                 this.ctx.beginPath();
-                this.ctx.moveTo(e.offsetX, e.offsetY);
+                this.ctx.moveTo(x, y);
             }
 
             draw(e) {
                 if (this.drawing) {
-                    this.ctx.lineTo(e.offsetX, e.offsetY);
+                    e.preventDefault(); // Prevents default touch actions (like scrolling)
+                    const x = e.offsetX !== undefined ? e.offsetX : e.touches[0].clientX - this.canvas.offsetLeft;
+                    const y = e.offsetY !== undefined ? e.offsetY : e.touches[0].clientY - this.canvas.offsetTop;
+                    this.ctx.lineTo(x, y);
                     this.ctx.strokeStyle = this.currentColor;
                     this.ctx.lineWidth = this.lineWidth;
                     this.ctx.lineCap = 'round';
@@ -180,7 +252,7 @@
             }
 
             stopDrawing() {
-                this.drawing = false;  // Set drawing to false when user stops drawing
+                this.drawing = false;
                 this.ctx.closePath();
             }
 
@@ -200,6 +272,12 @@
                 this.canvas.addEventListener('mousemove', (e) => this.draw(e));
                 this.canvas.addEventListener('mouseup', () => this.stopDrawing());
                 this.canvas.addEventListener('mouseleave', () => this.stopDrawing());
+
+                // Touch support
+                this.canvas.addEventListener('touchstart', (e) => this.startDrawing(e));
+                this.canvas.addEventListener('touchmove', (e) => this.draw(e));
+                this.canvas.addEventListener('touchend', () => this.stopDrawing());
+                this.canvas.addEventListener('touchcancel', () => this.stopDrawing());
 
                 document.getElementById('pencil-btn').addEventListener('click', () => {
                     this.setColor(this.currentColor);  // Default to the last selected color
@@ -223,55 +301,80 @@
                 this.canvas.removeEventListener('mousemove', (e) => this.draw(e));
                 this.canvas.removeEventListener('mouseup', () => this.stopDrawing());
                 this.canvas.removeEventListener('mouseleave', () => this.stopDrawing());
+
+                // Remove touch event listeners
+                this.canvas.removeEventListener('touchstart', (e) => this.startDrawing(e));
+                this.canvas.removeEventListener('touchmove', (e) => this.draw(e));
+                this.canvas.removeEventListener('touchend', () => this.stopDrawing());
+                this.canvas.removeEventListener('touchcancel', () => this.stopDrawing());
             }
         }
 
         class Game {
             constructor(words) {
                 this.words = words;
-                this.currentWord = "FISH"; // The word to be guessed
+                this.currentWord = this.getRandomWord();  // Random word at the start
+
+                // Assigning elements to instance variables
+                this.canvasElm = document.getElementById('drawingCanvas');
+                this.currentWordElm = document.getElementById('current-word');
+                this.playerListElm = document.getElementById('player-list');
+                this.answerLogElm = document.getElementById('answer-log');
+                this.timerElm = document.getElementById('timer');
+                this.leaderboardListElm = document.getElementById('leaderboard-list');
+
+                // Update UI with the initial word
+                this.currentWordElm.innerText = this.currentWord;
+
+                // Initialize NPCs
                 this.npcs = [
                     new NPC("NPC1"),
                     new NPC("NPC2"),
                     new NPC("NPC3")
                 ];
+
                 this.updatePlayerList();
                 this.startGuessing();
                 this.startTimer();
-                this.canvas = document.getElementById("drawingCanvas");
-                this.drawingApp = new DrawingApp(this.canvas);
+
+                this.drawingApp = new DrawingApp(this.canvasElm);  // Pass the canvasElm to DrawingApp
+            }
+
+            // Helper function to get a random word from the list
+            getRandomWord() {
+                return this.words[Math.floor(Math.random() * this.words.length)];
             }
 
             updatePlayerList() {
-                const playerListElement = document.getElementById('player-list');
-                playerListElement.innerHTML = '';
+                this.playerListElm.innerHTML = '';
                 this.npcs.forEach(npc => {
-                    playerListElement.innerHTML += npc.getPlayerListHTML();
+                    this.playerListElm.innerHTML += npc.getPlayerListHTML();
                 });
             }
 
             startGuessing() {
-                setInterval(async () => {
-                    // NPC Guess
-                    this.npcs.forEach(async (npc) => {
-                        const result = npc.guessWord(this.currentWord, this.words);
+                setInterval(() => {
+                    // Select a random NPC for the guess
+                    const randomNpc = this.npcs[Math.floor(Math.random() * this.npcs.length)];
 
-                        if (result.correct) {
-                            document.getElementById('answer-log').innerHTML += `<div class="text-success">${npc.name} guessed correctly!</div>`;
-                        } else {
-                            document.getElementById('answer-log').innerHTML += `<div class="text-white}">${npc.name}: ${result.text}</div>`;
-                        }
-                    });
+                    const result = randomNpc.guessWord(this.currentWord, this.words);
+
+                    if (result.correct) {
+                        this.answerLogElm.innerHTML += `<div class="text-success">${randomNpc.name} guessed correctly!</div>`;
+                    } else {
+                        this.answerLogElm.innerHTML += `<div>${randomNpc.name}: ${result.text}</div>`;
+                    }
+
                     this.updatePlayerList();
-                }, 10000);  // Check every 10 seconds
+                }, 10000);  // Check every 4 seconds
+
             }
 
             startTimer() {
                 let timeLeft = 60;
-                const timerElement = document.getElementById('timer');
                 const timerInterval = setInterval(() => {
                     timeLeft--;
-                    timerElement.innerText = `Time Left: ${timeLeft}s`;
+                    this.timerElm.innerText = `Time Left: ${timeLeft}s`;
                     if (timeLeft <= 0) {
                         clearInterval(timerInterval);
                         this.endGame();
@@ -285,34 +388,29 @@
             }
 
             showLeaderboard() {
-                const leaderboardList = document.getElementById("leaderboard-list");
                 const sortedNPCs = this.npcs.sort((a, b) => b.score - a.score);
-                leaderboardList.innerHTML = sortedNPCs.map(npc => `
+                this.leaderboardListElm.innerHTML = sortedNPCs.map(npc => `
                     <li>${npc.name}: ${npc.score} pts</li>
                 `).join("");
-                const leaderboardModal = new bootstrap.Modal(document.getElementById('leaderboardModal'));
+
+                const leaderboardElm = document.getElementById('leaderboardModal');
+                const leaderboardModal = new bootstrap.Modal(leaderboardElm);
                 leaderboardModal.show();
+
+                leaderboardElm.addEventListener('hidden.bs.modal', () => {
+                    console.log("reset game")
+                    this.resetGame()
+                });
             }
 
             resetGame() {
-                // Reset NPC scores
-                this.npcs.forEach(npc => npc.score = 0);
-                this.updatePlayerList();
-
-                // Clear chat log
-                document.getElementById('answer-log').innerHTML = '';
-                
-                // Clear the drawing on canvas
-                const ctx = this.canvas.getContext('2d');
-                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-                // Reset the timer and restart the game
-                this.startTimer();
-                this.startGuessing();
+                location.reload()
             }
         }
 
+        // Example of initializing the game
         const game = new Game(["FISH", "DOG", "CAT", "TREE", "MOUNTAIN"]);
     </script>
 </body>
+
 </html>
